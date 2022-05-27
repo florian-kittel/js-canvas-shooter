@@ -351,7 +351,7 @@ function animate() {
   animationId = requestAnimationFrame(animate);
 
   // Won game
-  if (killedEnemies > 2) {
+  if (killedEnemies === maxEnemies) {
     console.log('Won game');
     cancelAnimationFrame(animationId);
     modalElm.style.display = 'flex';
