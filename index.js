@@ -309,15 +309,15 @@ function spawnEnemies() {
 
 
 const sndShot = new Howl({
-  src: ['sounds/shot.ogg']
+  src: ['sounds/shot.ogg', 'sounds/shot.mp3']
 });
 
 const sndHit = new Howl({
-  src: ['sounds/explodemini.ogg'],
+  src: ['sounds/explodemini.ogg', 'sounds/explodemini.mp3'],
 });
 
 const sndExplode = new Howl({
-  src: ['sounds/explode.ogg']
+  src: ['sounds/explode.ogg', 'sounds/explode.mp3']
 });
 
 const sndAppear01 = new Howl({
@@ -337,11 +337,11 @@ const sndLose = new Howl({
 });
 
 const sndWon = new Howl({
-  src: ['sounds/won.ogg']
+  src: ['sounds/won.ogg', 'sounds/won.mp3']
 });
 
 const sndEBgMusic = new Howl({
-  src: ['sounds/ObservingTheStar.ogg'],
+  src: ['sounds/ObservingTheStar.ogg', 'sounds/ObservingTheStar.mp3'],
   autoplay: true,
   loop: true,
 });
