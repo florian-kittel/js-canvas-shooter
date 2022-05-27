@@ -262,8 +262,10 @@ function animate() {
 
 const speed = 5;
 
-addEventListener('click', (event) => {
+addEventListener('click', fireBullet);
+canvas.addEventListener("touchstart", fireBullet);
 
+function fireBullet(event) {
   const angle = Math.atan2(
     event.clientY - canvas.height / 2,
     event.clientX - canvas.width / 2
@@ -283,7 +285,7 @@ addEventListener('click', (event) => {
       velocity
     )
   );
-});
+}
 
 startGameBtn.addEventListener('click', () => {
   init();
