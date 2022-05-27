@@ -262,8 +262,7 @@ function animate() {
 
 const speed = 5;
 
-addEventListener('click', fireBullet);
-canvas.addEventListener("touchmove", fireBullet);
+canvas.addEventListener("click", fireBullet, false);
 
 function fireBullet(event) {
   const angle = Math.atan2(
