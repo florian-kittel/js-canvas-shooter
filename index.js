@@ -1,5 +1,8 @@
-const canvas = document.querySelector('canvas');
+import { Particles } from './classes/particles.class.js';
+import { Actor } from './classes/actor.class.js';
+import { Projectile } from './classes/projectile.class.js';
 
+const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
 canvas.width = innerWidth;
@@ -11,7 +14,7 @@ const cy = canvas.height / 2;
 let bulletSpeed = 5;
 let spawnTime = 2000;
 let spawnSizeMin = 5;
-let spawnSizeMax = 50;
+let spawnSizeMax = 40;
 let enemySpeed = 0.5;
 
 
@@ -23,104 +26,8 @@ const enemyState = document.querySelector('#enemyState');
 const wonElm = document.querySelector('#wonElm');
 const highScoreTable = document.querySelector('#highScoreTable');
 
-class Player {
-  constructor(x, y, radius, color) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-  }
 
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius,
-      0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-  }
-}
-
-class Projectile {
-  constructor(x, y, radius, color, velocity) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-    this.velocity = velocity;
-  }
-
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius,
-      0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-  }
-
-  update() {
-    this.draw();
-    this.x = this.x + this.velocity.x;
-    this.y = this.y + this.velocity.y;
-  }
-}
-
-class Enemy {
-  constructor(x, y, radius, color, velocity) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-    this.velocity = velocity;
-  }
-
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius,
-      0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-  }
-
-  update() {
-    this.draw();
-    this.x = this.x + this.velocity.x;
-    this.y = this.y + this.velocity.y;
-  }
-}
-
-const friction = 0.98;
-class Partical {
-  constructor(x, y, radius, color, velocity) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-    this.velocity = velocity;
-    this.alpha = 1;
-  }
-
-  draw() {
-    ctx.save();
-    ctx.globalAlpha = this.alpha;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius,
-      0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.restore();
-  }
-
-  update() {
-    this.draw();
-    this.velocity.x *= friction;
-    this.velocity.y *= friction;
-    this.x = this.x + this.velocity.x;
-    this.y = this.y + this.velocity.y;
-    this.alpha -= 0.01;
-  }
-}
-
-let player = new Player(cx, cy, 10, 'white');
+let player = new Actor(ctx, cx, cy, 10, 'white', 0);
 let projectiles = [];
 let particals = [];
 let enemies = [];
@@ -134,7 +41,7 @@ let killedEnemies = 0;
 let spawedEnemies = 0;
 
 function init() {
-  player = new Player(cx, cy, 10, 'white');
+  player = new Actor(ctx, cx, cy, 10, 'white', 0);
   projectiles = [];
   particals = [];
   enemies = [];
@@ -217,13 +124,15 @@ function spawnEnemies() {
   }
 
   if (killedEnemies > 60) {
-    spawnTime = 1000;
-    enemySpeed = 1.5;
+    spawnTime = 1500;
+    enemySpeed = 1.25;
   }
 
   if (killedEnemies > 80) {
-    spawnTime = 500;
-    enemySpeed = 2;
+    spawnTime = 1000;
+    enemySpeed = 1.5;
+    spawnSizeMax = 20;
+    spawnSizeMin = 10;
   }
 
   let radius = getValueFromRange(spawnSizeMin, spawnSizeMax);
@@ -248,32 +157,32 @@ function spawnEnemies() {
   }
 
   if (spawedEnemies === 5) {
-    radius = 100;
+    radius = 60;
     enemySpeed = 1;
   }
 
   if (spawedEnemies === 20) {
-    radius = 150;
+    radius = 80;
   }
 
   if (spawedEnemies === 30) {
     radius = 100;
-  }
-
-  if (spawedEnemies === 30) {
-    radius = 150;
+    enemySpeed = 0.5;
   }
 
   if (spawedEnemies === 40) {
-    radius = 200;
+    radius = 100;
+    enemySpeed = 0.5;
   }
 
   if (spawedEnemies === 50) {
     radius = 100;
+    enemySpeed = 0.25;
   }
 
   if (spawedEnemies === 70) {
-    radius = 200;
+    radius = 80;
+    enemySpeed = 0.25;
   }
 
   let x = 0;
@@ -299,56 +208,39 @@ function spawnEnemies() {
     y: Math.sin(angle) * enemySpeed
   }
 
-  enemies.push(new Enemy(x, y, radius, color, velocity));
-  sndAppear01.play();
+  enemies.push(new Actor(ctx, x, y, radius, color, velocity));
 
+  if (radius > 40) {
+    sndAppear03.play();
 
+  } else {
+    sndAppear01.play();
+
+  }
 
   enemySpawnInterval = setTimeout(() => spawnEnemies(), spawnTime + Math.random() * 100);
 }
 
 
-const sndShot = new Howl({
-  src: ['sounds/shot.ogg', 'sounds/shot.mp3']
-});
+const sndShot = new Howl({ src: ['sounds/shot.ogg', 'sounds/shot.mp3'] });
+const sndHit = new Howl({ src: ['sounds/explodemini.ogg', 'sounds/explodemini.mp3'], });
+const sndExplode = new Howl({ src: ['sounds/explode.ogg', 'sounds/explode.mp3'] });
+const sndAppear01 = new Howl({ src: ['sounds/appear01.mp3'] });
+const sndAppear02 = new Howl({ src: ['sounds/appear02.mp3'] });
+const sndAppear03 = new Howl({ src: ['sounds/appear03.mp3'] });
+const sndLose = new Howl({ src: ['sounds/lose.mp3'] });
+const sndWon = new Howl({ src: ['sounds/won.ogg', 'sounds/won.mp3'] });
 
-const sndHit = new Howl({
-  src: ['sounds/explodemini.ogg', 'sounds/explodemini.mp3'],
-});
-
-const sndExplode = new Howl({
-  src: ['sounds/explode.ogg', 'sounds/explode.mp3']
-});
-
-const sndAppear01 = new Howl({
-  src: ['sounds/appear01.mp3']
-});
-
-const sndAppear02 = new Howl({
-  src: ['sounds/appear02.mp3']
-});
-
-const sndAppear03 = new Howl({
-  src: ['sounds/appear03.mp3']
-});
-
-const sndLose = new Howl({
-  src: ['sounds/lose.mp3']
-});
-
-const sndWon = new Howl({
-  src: ['sounds/won.ogg', 'sounds/won.mp3']
-});
-
-const sndEBgMusic = new Howl({
+// Start Background music
+new Howl({
   src: ['sounds/ObservingTheStar.ogg', 'sounds/ObservingTheStar.mp3'],
   autoplay: true,
   loop: true,
 });
 
 
-function animate() {
-  animationId = requestAnimationFrame(animate);
+function gameLoop() {
+  animationId = requestAnimationFrame(gameLoop);
 
   // Won game
   if (killedEnemies === maxEnemies) {
@@ -426,7 +318,8 @@ function animate() {
         // Create explosions
         let particleSize = enemy.radius < 20 ? enemy.radius * 2 : enemy.radius;
         for (let i = 0; i < particleSize; i++) {
-          particals.push(new Partical(
+          particals.push(new Particles(
+            ctx,
             projectile.x,
             projectile.y,
             Math.random() * 2,
@@ -494,6 +387,7 @@ function fireBullet(event) {
 
   projectiles.push(
     new Projectile(
+      ctx,
       canvas.width / 2,
       canvas.height / 2,
       5,
@@ -505,7 +399,7 @@ function fireBullet(event) {
 
 startGameBtn.addEventListener('click', () => {
   init();
-  animate();
+  gameLoop();
   spawnEnemies();
   modalElm.style.display = 'none';
 });
