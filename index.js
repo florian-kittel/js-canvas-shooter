@@ -2,8 +2,12 @@ import { Particles } from './classes/particles.class.js';
 import { Actor } from './classes/actor.class.js';
 import { Projectile } from './classes/projectile.class.js';
 
+import { loadScore, saveScore, updateScore } from './functions/score.functions.js';
+
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
+
+ctx.webkitImageSmoothingEnabled = true;
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -17,17 +21,25 @@ let spawnSizeMin = 5;
 let spawnSizeMax = 40;
 let enemySpeed = 0.5;
 
-
-const scoreElm = document.querySelector('#scoreElm');
-const bigScoreElm = document.querySelector('#bigScoreElm');
 const startGameBtn = document.querySelector('#startGameBtn');
 const modalElm = document.querySelector('#modalElm');
 const enemyState = document.querySelector('#enemyState');
 const wonElm = document.querySelector('#wonElm');
-const highScoreTable = document.querySelector('#highScoreTable');
+const durationElm = document.querySelector('#durationElm');
 
+let playerColor = 'rgb(200,200,200)';
+let projectileColor = 'rgba200,200,200)';
+let backgroud = 'rgba(0,0,0,.2)';
 
-let player = new Actor(ctx, cx, cy, 10, 'white', 0);
+let isLightTheme = false;
+
+if (isLightTheme) {
+  playerColor = 'rgb(200,200,200)';
+  projectileColor = 'rgb(200,200,200)';
+  backgroud = 'rgba(240,240,240,0.2)';
+}
+
+let player = new Actor(ctx, cx, cy, 10, playerColor, 0);
 let projectiles = [];
 let particals = [];
 let enemies = [];
@@ -40,8 +52,11 @@ let maxEnemies = 100;
 let killedEnemies = 0;
 let spawedEnemies = 0;
 
+let timer;
+let duration = 0;
+
 function init() {
-  player = new Actor(ctx, cx, cy, 10, 'white', 0);
+  player = new Actor(ctx, cx, cy, 10, playerColor, 0);
   projectiles = [];
   particals = [];
   enemies = [];
@@ -49,59 +64,35 @@ function init() {
   updateScore(0);
   spawedEnemies = 0;
   killedEnemies = 0;
+  duration = 0;
   updateEnemyState();
+  startTimer();
+
+  bgMusic.play();
 }
 
-function loadScore() {
-  const storage = localStorage.getItem('canvasGameScore');
-  let highScores = [];
-
-  if (storage) {
-    highScores = JSON.parse(storage);
-
-    highScoreTable.innerHTML = '';
-
-    highScores.forEach(entry => {
-
-      highScoreTable.innerHTML += `<tr>
-      <td>${entry.score}</td>
-      <td>${entry.state}</td>
-      <td>${entry.enemies}</td>
-      <td>${entry.date}</td>
-      </tr>`;
-    })
-
-  }
+function stopGame() {
+  cancelAnimationFrame(animationId);
+  clearInterval(enemySpawnInterval);
+  loadScore();
+  stopTimer();
+  bgMusic.stop();
 }
 
-function saveScore(score, state) {
-  const storage = localStorage.getItem('canvasGameScore');
-  let highScores = [];
-  if (storage) {
-    highScores = JSON.parse(storage);
-  }
+function startTimer() {
+  timer = setInterval(() => {
+    duration++;
+    durationElm.innerHTML = duration + 's';
+  }, 1000);
+}
 
-  highScores.push({
-    date: new Date(),
-    state: state,
-    enemies: killedEnemies,
-    score: score
-  });
-
-  highScores.sort((a, b) => (a.score < b.score) ? 1 : ((b.score < a.score) ? -1 : 0));
-
-  highScores.splice(9);
-
-  localStorage.setItem('canvasGameScore', JSON.stringify(highScores));
+function stopTimer() {
+  clearInterval(timer);
+  durationElm.innerHTML = duration + 's';
 }
 
 function getValueFromRange(minum, maximum) {
   return Math.ceil(Math.random() * (maximum - minum) + minum);
-}
-
-function updateScore(number) {
-  score += number;
-  scoreElm.innerHTML = score;
 }
 
 function updateEnemyState() {
@@ -232,11 +223,37 @@ const sndLose = new Howl({ src: ['sounds/lose.mp3'] });
 const sndWon = new Howl({ src: ['sounds/won.ogg', 'sounds/won.mp3'] });
 
 // Start Background music
-new Howl({
+const bgMusic = new Howl({
   src: ['sounds/ObservingTheStar.ogg', 'sounds/ObservingTheStar.mp3'],
-  autoplay: true,
+  autoplay: false,
   loop: true,
 });
+
+
+function wonGame() {
+  console.log('Won game');
+
+  modalElm.style.display = 'flex';
+
+
+  sndWon.play();
+  wonElm.style.display = 'block';
+  saveScore(score, 'won', killedEnemies);
+
+  stopGame()
+}
+
+function loseGame() {
+  console.log('End game')
+
+  modalElm.style.display = 'flex';
+  wonElm.style.display = 'none';
+
+  sndLose.play();
+  saveScore(score, 'lose', killedEnemies);
+
+  stopGame();
+}
 
 
 function gameLoop() {
@@ -244,22 +261,12 @@ function gameLoop() {
 
   // Won game
   if (killedEnemies === maxEnemies) {
-    console.log('Won game');
-    cancelAnimationFrame(animationId);
-    modalElm.style.display = 'flex';
-    bigScoreElm.innerHTML = score;
-
-    clearInterval(enemySpawnInterval);
-
-    sndWon.play();
-    wonElm.style.display = 'block';
-    saveScore(score, 'won');
-    loadScore();
+    wonGame();
     return;
   }
 
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  ctx.fillStyle = backgroud;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   player.draw();
@@ -295,16 +302,7 @@ function gameLoop() {
     // End Game
 
     if (dist - enemy.radius / 2 - player.radius < 1) {
-      console.log('End game')
-      cancelAnimationFrame(animationId);
-      modalElm.style.display = 'flex';
-      bigScoreElm.innerHTML = score;
-
-      clearInterval(enemySpawnInterval);
-      wonElm.style.display = 'none';
-      sndLose.play();
-      saveScore(score, 'lose');
-      loadScore();
+      loseGame();
       return;
     }
 
@@ -390,8 +388,8 @@ function fireBullet(event) {
       ctx,
       canvas.width / 2,
       canvas.height / 2,
-      5,
-      'white',
+      3,
+      projectileColor,
       velocity
     )
   );

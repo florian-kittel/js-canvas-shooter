@@ -9,7 +9,7 @@
 
   <style>
     body {
-      background-color: black;
+      background-color: rgb(175, 175, 175);
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -41,10 +41,13 @@
     <span> | </span>
     <span> Enemies: </span>
     <span id="enemyState"> 0/100 </span>
+    <span> | </span>
+    <span id="durationElm"> 0s </span>
   </div>
 
-  <div class="fixed inset-0 flex items-center justify-center select-none" id="modalElm">
-    <div class="bg-white max-w-md w-full p-6 text-center">
+  <div class="fixed inset-0 m-3 flex items-center justify-center select-none " id="modalElm">
+    <div class="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl text-center"
+      style="max-height:100%; overflow-y:auto;">
       <h1 class="text-4xl font-bold leading-none" id="wonElm" style="display: none;">You are great!</h1>
       <h1 class="text-4xl font-bold leading-none" id="bigScoreElm">0</h1>
       <p class="text-sm text-gray-700 mb-4">Points</p>
@@ -54,19 +57,21 @@
 
       <div class="pt-4 text-left">
         <h2 class="text-2xl mb-2">High score</h2>
-        <table class="table-auto w-full">
-          <thead>
-            <tr>
-              <th>Score</th>
-              <th>State</th>
-              <th>Enemies</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody id="highScoreTable">
-          </tbody>
-        </table>
-        <pre></pre>
+        <div style="overflow: auto;">
+
+          <table class="table-auto w-full">
+            <thead>
+              <tr>
+                <th>Score</th>
+                <th>State</th>
+                <th>Enemies</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="highScoreTable">
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
