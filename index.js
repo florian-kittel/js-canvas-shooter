@@ -26,18 +26,13 @@ const modalElm = document.querySelector('#modalElm');
 const enemyState = document.querySelector('#enemyState');
 const wonElm = document.querySelector('#wonElm');
 const durationElm = document.querySelector('#durationElm');
+const useWhiteTheme = document.querySelector('#useWhiteTheme');
+const hudElm = document.querySelector('#hudElm');
 
+// Defaults
 let playerColor = 'rgb(200,200,200)';
 let projectileColor = 'rgba200,200,200)';
 let backgroud = 'rgba(0,0,0,.2)';
-
-let isLightTheme = false;
-
-if (isLightTheme) {
-  playerColor = 'rgb(200,200,200)';
-  projectileColor = 'rgb(200,200,200)';
-  backgroud = 'rgba(240,240,240,0.2)';
-}
 
 let player = new Actor(ctx, cx, cy, 10, playerColor, 0);
 let projectiles = [];
@@ -55,6 +50,21 @@ let spawedEnemies = 0;
 let timer;
 let duration = 0;
 
+function chooseTheme(white) {
+  if (white) {
+    playerColor = 'rgb(200,200,200)';
+    projectileColor = 'rgb(200,200,200)';
+    backgroud = 'rgba(240,240,240,0.2)';
+
+    hudElm.classList.remove("text-white");
+  } else {
+    playerColor = 'rgb(200,200,200)';
+    projectileColor = 'rgba200,200,200)';
+    backgroud = 'rgba(0,0,0,.2)';
+    hudElm.classList.add("text-white");
+  }
+}
+
 function init() {
   player = new Actor(ctx, cx, cy, 10, playerColor, 0);
   projectiles = [];
@@ -69,6 +79,7 @@ function init() {
   startTimer();
 
   bgMusic.play();
+  chooseTheme(useWhiteTheme.checked);
 }
 
 function stopGame() {

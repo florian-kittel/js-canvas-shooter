@@ -35,7 +35,7 @@
 </head>
 
 <body>
-  <div class="fixed text-white text-sm m-2 select-none">
+  <div id="hudElm" class="fixed text-white text-sm m-2 select-none">
     <span>Score: </span>
     <span id="scoreElm">0</span>
     <span> | </span>
@@ -53,6 +53,15 @@
       <p class="text-sm text-gray-700 mb-4">Points</p>
       <div>
         <button class="bg-blue-500 text-white w-full py-3 rounded-full text-sm" id="startGameBtn">Start game</button>
+      </div>
+
+      <div class="my-4 flex justify-center">
+        <div class="form-check">
+          <input type="checkbox" value="true" id="useWhiteTheme">
+          <label class="form-check-label inline-block text-gray-800" for="useWhiteTheme">
+            Use light theme
+          </label>
+        </div>
       </div>
 
       <div class="pt-4 text-left">
