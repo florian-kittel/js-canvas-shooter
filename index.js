@@ -367,6 +367,9 @@ function gameLoop() {
 
 
 canvas.addEventListener("click", fireBullet, false);
+canvas.addEventListener('touchmove', function (e) {
+  e.preventDefault();
+}, { passive: false });
 
 let mousePosition = { x: 0, y: 0 };
 document.addEventListener('mousemove', function (mouseMoveEvent) {
