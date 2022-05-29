@@ -28,6 +28,7 @@ const wonElm = document.querySelector('#wonElm');
 const durationElm = document.querySelector('#durationElm');
 const useWhiteTheme = document.querySelector('#useWhiteTheme');
 const hudElm = document.querySelector('#hudElm');
+const disableSound = document.querySelector('#disableSound');
 
 // Defaults
 let playerColor = 'rgb(200,200,200)';
@@ -48,6 +49,7 @@ let spawedEnemies = 0;
 
 let timer;
 let duration = 0;
+let noSound = false;
 
 function chooseTheme(white) {
   if (white) {
@@ -76,9 +78,11 @@ function init() {
   updateEnemyState();
   startTimer();
 
-  bgMusic.play();
   chooseTheme(useWhiteTheme.checked);
   resetScore();
+  
+  noSound = disableSound.checked;
+  noSound ? '' : bgMusic.play();
 }
 
 function stopGame() {
@@ -86,7 +90,7 @@ function stopGame() {
   clearInterval(enemySpawnInterval);
   loadScore();
   stopTimer();
-  bgMusic.stop();
+  noSound ? '' : bgMusic.stop();
 }
 
 function startTimer() {
@@ -212,10 +216,10 @@ function spawnEnemies() {
   enemies.push(new Actor(ctx, x, y, radius, color, velocity));
 
   if (radius > 40) {
-    sndAppear03.play();
+    noSound ? '' : sndAppear03.play();
 
   } else {
-    sndAppear01.play();
+    noSound ? '' : sndAppear01.play();
 
   }
 
@@ -246,7 +250,7 @@ function wonGame() {
   modalElm.style.display = 'flex';
 
 
-  sndWon.play();
+  noSound ? '' : sndWon.play();
   wonElm.style.display = 'block';
   saveScore('won', killedEnemies);
 
@@ -259,7 +263,7 @@ function loseGame() {
   modalElm.style.display = 'flex';
   wonElm.style.display = 'none';
 
-  sndLose.play();
+  noSound ? '' : sndLose.play();
   saveScore('lose', killedEnemies);
 
   stopGame();
@@ -341,7 +345,7 @@ function gameLoop() {
 
         if (enemy.radius - 10 > 10) {
           // enemy.radius -= 10;
-          sndHit.play();
+          noSound ? '' : sndHit.play();
           updateScore(100);
 
           gsap.to(enemy, {
@@ -350,7 +354,7 @@ function gameLoop() {
           projectiles.splice(projectileIndex, 1);
         } else {
           updateScore(250);
-          sndExplode.play();
+          noSound ? '' : sndExplode.play();
 
           setTimeout(() => {
             enemies.splice(index, 1);
@@ -384,7 +388,7 @@ document.addEventListener('keyup', event => {
 
 function fireBullet(event) {
 
-  sndShot.play();
+  noSound ? '' : sndShot.play();
 
   const angle = Math.atan2(
     event.clientY - canvas.height / 2,
