@@ -2,7 +2,7 @@ import { Particles } from './classes/particles.class.js';
 import { Actor } from './classes/actor.class.js';
 import { Projectile } from './classes/projectile.class.js';
 
-import { loadScore, saveScore, updateScore, resetScore } from './functions/score.functions.js';
+import { loadScore, saveScore, updateScore, resetScore, updateVersion } from './functions/score.functions.js';
 
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
@@ -252,7 +252,7 @@ function wonGame() {
 
   noSound ? '' : sndWon.play();
   wonElm.style.display = 'block';
-  saveScore('won', killedEnemies);
+  saveScore('won', killedEnemies, duration);
 
   stopGame()
 }
@@ -264,7 +264,7 @@ function loseGame() {
   wonElm.style.display = 'none';
 
   noSound ? '' : sndLose.play();
-  saveScore('lose', killedEnemies);
+  saveScore('lose', killedEnemies, duration);
 
   stopGame();
 }
@@ -420,3 +420,4 @@ startGameBtn.addEventListener('click', () => {
 });
 
 loadScore();
+updateVersion();
