@@ -26,7 +26,7 @@ function loadScore() {
   }
 }
 
-function saveScore(score, state, killedEnemies) {
+function saveScore(state, killedEnemies) {
   const storage = localStorage.getItem('canvasGameScore');
   let highScores = [];
   if (storage) {
@@ -54,8 +54,14 @@ function updateScore(number) {
   bigScoreElm.innerHTML = score;
 }
 
+function resetScore() {
+  score = 0;
+  updateScore(0);
+}
+
 export {
   loadScore,
   saveScore,
-  updateScore
+  updateScore,
+  resetScore
 }

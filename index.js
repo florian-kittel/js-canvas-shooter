@@ -2,7 +2,7 @@ import { Particles } from './classes/particles.class.js';
 import { Actor } from './classes/actor.class.js';
 import { Projectile } from './classes/projectile.class.js';
 
-import { loadScore, saveScore, updateScore } from './functions/score.functions.js';
+import { loadScore, saveScore, updateScore, resetScore } from './functions/score.functions.js';
 
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
@@ -38,7 +38,6 @@ let player = new Actor(ctx, cx, cy, 10, playerColor, 0);
 let projectiles = [];
 let particals = [];
 let enemies = [];
-let score = 0;
 
 let animationId;
 let enemySpawnInterval;
@@ -70,7 +69,6 @@ function init() {
   projectiles = [];
   particals = [];
   enemies = [];
-  score = 0;
   updateScore(0);
   spawedEnemies = 0;
   killedEnemies = 0;
@@ -80,6 +78,7 @@ function init() {
 
   bgMusic.play();
   chooseTheme(useWhiteTheme.checked);
+  resetScore();
 }
 
 function stopGame() {
@@ -249,7 +248,7 @@ function wonGame() {
 
   sndWon.play();
   wonElm.style.display = 'block';
-  saveScore(score, 'won', killedEnemies);
+  saveScore('won', killedEnemies);
 
   stopGame()
 }
@@ -261,7 +260,7 @@ function loseGame() {
   wonElm.style.display = 'none';
 
   sndLose.play();
-  saveScore(score, 'lose', killedEnemies);
+  saveScore('lose', killedEnemies);
 
   stopGame();
 }
