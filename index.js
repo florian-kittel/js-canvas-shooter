@@ -322,7 +322,7 @@ function gameLoop() {
       const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
 
       // Projectile hit enemy
-      if (dist - enemy.radius / 2 - projectile.radius < 1) {
+      if (dist - enemy.radius - projectile.radius < 1) {
 
         // Create explosions
         let particleSize = enemy.radius < 20 ? enemy.radius * 2 : enemy.radius;
